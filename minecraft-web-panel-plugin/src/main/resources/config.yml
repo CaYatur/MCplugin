@@ -1,0 +1,26 @@
+# Minecraft Web Panel Plugin Configuration
+
+server:
+  port: 8080
+  websocket-port: 8081
+  host: "0.0.0.0"
+
+web:
+  auto-create-files: true
+  title: "Minecraft Web Panel"
+  refresh-interval: 5000
+
+security:
+  api-key: "CHANGE_ME"
+  enable-authentication: false
+  allowed-ips: []
+
+features:
+  console-commands: true
+  chat-integration: true
+  player-management: true
+  server-stats: true
+
+logging:
+  enable-access-log: true
+  log-level: "INFO"

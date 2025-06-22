@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Panel Girişi</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            background: var(--panel-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .form-input {
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+        .login-btn {
+            padding: 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .login-btn:hover {
+            background: #45a049;
+        }
+        .login-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        .error-message {
+            color: #ff4444;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border: 1px solid #2196F3;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #1565C0;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1 style="text-align: center; color: var(--primary-color);">🎮 Minecraft Web Panel</h1>
+        
+        <div class="info-box">
+            <strong>Giriş Bilgileri:</strong><br>
+            • Sadece operatörler giriş yapabilir<br>
+            • Kullanıcı adı: Minecraft nick'iniz<br>
+            • Şifre belirlemek için: <code>/webpanel setpass &lt;şifre&gt;</code>
+        </div>
+
+        <form class="login-form" id="loginForm">
+            <div class="form-group">
+                <label for="username">Kullanıcı Adı (Minecraft Nick)</label>
+                <input type="text" id="username" class="form-input" placeholder="Minecraft kullanıcı adınız" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Şifre</label>
+                <input type="password" id="password" class="form-input" placeholder="Web panel şifreniz" required>
+            </div>
+            
+            <button type="submit" class="login-btn" id="loginBtn">
+                Giriş Yap
+            </button>
+            
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Disable button
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Giriş yapılıyor...';
+            errorMessage.style.display = 'none';
+            
+            try {
+                const response = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    // Session'ı localStorage'a kaydet
+                    localStorage.setItem('webpanel_session', data.sessionId);
+                    localStorage.setItem('webpanel_username', data.username);
+                    
+                    // Ana sayfaya yönlendir
+                    window.location.href = '/';
+                } else {
+                    errorMessage.textContent = data.message;
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                errorMessage.textContent = 'Bağlantı hatası: ' + error.message;
+                errorMessage.style.display = 'block';
+            }
+            
+            // Re-enable button
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Giriş Yap';
+        });
+    </script>
+</body>
+</html>
