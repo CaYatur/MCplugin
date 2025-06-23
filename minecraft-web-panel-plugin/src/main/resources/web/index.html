@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Web Panel</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <h1>🎮 Minecraft Web Panel</h1>
+                <div class="status" id="connectionStatus">
+                    <span class="status-dot offline"></span>
+                    Bağlantı bekleniyor...
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Karanlık/Aydınlık Mod">
+                    🌙
+                </button>
+            </div>
+        </header>
+
+        <main>
+            <div class="panel-grid">
+                <!-- Oyuncu Yönetimi -->
+                <div class="panel">
+                    <h2>👥 Oyuncu Yönetimi</h2>
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab('online-players')">Çevrimiçi</button>
+                        <button class="tab" onclick="switchTab('banned-players')">Yasaklılar</button>
+                        <button class="tab" onclick="switchTab('banned-ips')">IP Yasakları</button>
+                    </div>
+                    
+                    <div id="online-players" class="tab-content active">
+                        <div id="playersList" class="players-container">
+                            <p>Oyuncu listesi yükleniyor...</p>
+                        </div>
+                    </div>
+                    
+                    <div id="banned-players" class="tab-content">
+                        <div id="bannedPlayersList" class="ban-list">
+                            <p>Yasaklı oyuncu listesi yükleniyor...</p>
+                        </div>
+                    </div>
+                    
+                    <div id="banned-ips" class="tab-content">
+                        <div id="bannedIpsList" class="ban-list">
+                            <p>Yasaklı IP listesi yükleniyor...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Anlık Sohbet -->
+                <div class="panel">
+                    <h2>💬 Anlık Sohbet</h2>
+                    <div id="chatMessages" class="chat-messages"></div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Mesajınızı yazın..." maxlength="256">
+                        <button onclick="sendChatMessage()">📤 Gönder</button>
+                    </div>
+                </div>
+
+                <!-- Gelişmiş Konsol -->
+                <div class="panel">
+                    <h2>🖥️ Sunucu Konsolu</h2>
+                    <div id="consoleOutput" class="console-output"></div>
+                    <div class="console-input">
+                        <input type="text" id="consoleInput" placeholder="Konsol komutu girin..." maxlength="256">
+                        <button onclick="sendCommand()">⚡ Çalıştır</button>
+                    </div>
+                </div>
+
+                <!-- Sunucu İstatistikleri -->
+                <div class="panel">
+                    <h2>📊 Sunucu İstatistikleri</h2>
+                    <div id="serverStats" class="stats-container">
+                        <div class="stat-item">
+                            <span class="stat-label">Çevrimiçi Oyuncular:</span>
+                            <span class="stat-value" id="onlineCount">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Maksimum:</span>
+                            <span class="stat-value" id="maxPlayers">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Sunucu Sürümü:</span>
+                            <span class="stat-value" id="serverVersion">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">TPS:</span>
+                            <span class="stat-value" id="serverTps">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">RAM Kullanımı:</span>
+                            <span class="stat-value" id="ramUsage">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Çalışma Süresi:</span>
+                            <span class="stat-value" id="uptime">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sunucu Yönetimi -->
+                <div class="panel">
+                    <h2>⚙️ Sunucu Yönetimi</h2>
+                    <div class="stats-container">
+                        <button class="action-btn info" onclick="reloadServer()" style="width: 100%; padding: 15px; margin: 5px 0;">
+                            🔄 Sunucuyu Yeniden Yükle
+                        </button>
+                        <button class="action-btn warning" onclick="saveAll()" style="width: 100%; padding: 15px; margin: 5px 0;">
+                            💾 Tüm Dünyaları Kaydet
+                        </button>
+                        <button class="action-btn kick" onclick="kickAllPlayers()" style="width: 100%; padding: 15px; margin: 5px 0;">
+                            👋 Tüm Oyuncuları At
+                        </button>
+                        <button class="action-btn ban" onclick="stopServer()" style="width: 100%; padding: 15px; margin: 5px 0;">
+                            ⛔ Sunucuyu Durdur
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DUYURULAR PANELİ -->
+                <div class="panel">
+                    <h2>📢 Duyurular</h2>
+                    <div id="announcementsList" class="announcements-list"></div>
+                    <button onclick="showAnnouncementModal()" class="action-btn info" style="width:100%;margin-top:10px;">➕ Duyuru Ekle</button>
+                </div>
+
+                <!-- HİLE UYARILARI PANELİ -->
+                <div class="panel">
+                    <h2>🚨 Hile Uyarıları</h2>
+                    <div id="cheatAlertsList" class="cheat-alerts-list"></div>
+                </div>
+                <!-- RAPORLAR PANELİ -->
+                <div class="panel">
+                    <h2>📝 Oyuncu Raporları</h2>
+                    <div id="reportsList" class="reports-list"></div>
+                </div>
+
+                <!-- HİLE AYARLARI PANELİ -->
+                <div class="panel">
+                    <h2>⚙️ Hile Tespit Ayarları</h2>
+                    <form id="cheatSettingsForm" onsubmit="saveCheatSettings(event)">
+                        <label><input type="checkbox" id="cheatDetectSpeed" checked> Hızlı Hareket Tespiti</label><br>
+                        <label><input type="checkbox" id="cheatDetectFly" checked> Uçma Tespiti</label><br>
+                        <label><input type="checkbox" id="cheatDetectFastBreak" checked> Hızlı Blok Kırma Tespiti</label><br>
+                        <button type="submit" class="action-btn success" style="margin-top:10px;width:100%;">Kaydet</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+        <!-- Duyuru Ekle Modalı -->
+        <div id="announcementModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close" onclick="closeAnnouncementModal()">&times;</span>
+                <h2>Duyuru Ekle</h2>
+                <form id="announcementForm" onsubmit="submitAnnouncement(event)">
+                    <label>Başlık:</label>
+                    <input type="text" id="annTitle" maxlength="64" required><br>
+                    <label>Mesaj:</label>
+                    <textarea id="annMessage" maxlength="256" required></textarea><br>
+                    <label>Tip/Renk:</label>
+                    <select id="annType">
+                        <option value="INFO">Bilgi (Mavi)</option>
+                        <option value="SUCCESS">Başarı (Yeşil)</option>
+                        <option value="WARNING">Uyarı (Sarı)</option>
+                        <option value="ERROR">Hata (Kırmızı)</option>
+                    </select><br>
+                    <label>Zamanlama:</label>
+                    <select id="annTiming" onchange="toggleAnnTiming()">
+                        <option value="now">Anında</option>
+                        <option value="once">Belirli Tarih/Saat</option>
+                        <option value="repeat">Belirli Aralıklarla</option>
+                    </select><br>
+                    <div id="annTimeFields" style="display:none;">
+                        <input type="datetime-local" id="annDateTime"><br>
+                        <input type="number" id="annInterval" min="1" placeholder="Tekrar (dk)">
+                    </div>
+                    <button type="submit" class="action-btn success" style="width:100%;margin-top:10px;">Kaydet</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Oyuncu Bilgisi Modalı -->
+        <div id="playerModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close" onclick="document.getElementById('playerModal').style.display='none'">&times;</span>
+                <h2 id="modalTitle">Oyuncu Bilgisi</h2>
+                <div id="modalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript dosyaları - SIRAYA DİKKAT! -->
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/websocket.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/ui.js"></script>
+</body>
+</html>

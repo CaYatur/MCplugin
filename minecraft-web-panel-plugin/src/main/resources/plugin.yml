@@ -1,0 +1,25 @@
+name: MinecraftWebPanel
+version: 1.0-SNAPSHOT
+main: com.yourname.webpanel.WebPanelPlugin
+api-version: 1.21
+author: CaYaDev
+description: Minecraft Web Control Panel Plugin
+website: https://github.com/cayatur
+
+commands:
+  webpanel:
+    description: Web Panel command
+    usage: /<command> [status|reload|info]
+    permission: webpanel.use
+    permission-message: You don't have permission to use this command
+  report:
+    description: Oyuncu raporlama komutu
+    usage: /report <oyuncu> [sebep]
+
+permissions:
+  webpanel.use:
+    description: Allows access to web panel commands
+    default: op
+  webpanel.admin:
+    description: Allows full access to web panel
+    default: op
